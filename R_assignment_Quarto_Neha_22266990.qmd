@@ -1,0 +1,324 @@
+---
+title: "Neha_R_Assignment_22266990"
+Student no: "22266990"
+format: html
+Date : "23/04/2023"
+execute: 
+  echo: false
+  warning: false
+  message: false
+output : 
+  html_document:
+    css: styles.css
+---
+
+```{css}
+h1 {
+  color: navy;
+}
+
+h2 {
+  color: #336699;
+}
+
+h3 {
+  color: #6699CC;
+}
+```
+```{css}
+h1 {
+        font-family: "Times New Roman", Times, serif;
+        font-size: 36px;
+        color: navy; /* green */
+      }
+      
+      h2 {
+        font-family: "Times New Roman", Times, serif;
+        font-size: 28px;
+        color: #336699; /* blue */
+      }
+      
+      h3 {
+        font-family: "Times New Roman", Times, serif;
+        font-size: 24px;
+        color: black; /* orange */
+      }
+      
+      h4 {
+        font-family: "Times New Roman", Times, serif;
+        font-size: 20px;
+        color: black; /* pink */
+      }
+```
+```{css}
+h1 {
+  font-size: 36px;
+}
+
+h2 {
+  font-size: 28px;
+}
+
+h3 {
+  font-size: 24px;
+}
+
+h4 {
+  font-size: 20px;
+}
+```
+
+```{css}
+body {
+  line-height: 2;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+p {
+  margin-bottom: 1em;
+}
+```
+
+```{r, echo=FALSE}
+CSV1 <- read.csv("C:\\Users\\lenovo\\Desktop\\IND2.csv")
+```
+```{r, echo=FALSE}
+CSV2 <- read.csv("C:\\Users\\lenovo\\Desktop\\Meta.csv")
+```
+```{r, echo=FALSE}
+library(dplyr)
+```
+
+```{r, echo=FALSE}
+CSV3 <- inner_join(CSV2, CSV1, by = "country", relationship = "many-to-many")
+```
+# 1. **Visualization 1**: ***WORLD MAP for the Year 2020***
+
+## Visualization of 2020 global population distribution on a world map.
+### *World map*: It is a graphical representation of the surface of the earth, showing the continents, oceans, countries, and other geographic features. It is an essential tool for understanding the geography of the world and the relationships between different regions.
+### In the context of population, a world map is particularly important because it can show how the global population is distributed across different countries and regions. This information can help us to better understand population dynamics, including patterns of migration, urbanization, and economic development.
+
+```{r, echo=FALSE}
+CSV1 <- read.csv("C:\\Users\\lenovo\\Desktop\\RT.csv")
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(rworldmap)
+library(maptools)
+library(maps)
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(forcats)
+library(RColorBrewer)
+library(ggrepel)
+library(scales)
+library(viridisLite)
+library(plotly)
+library(dplyr)
+library(conflicted)
+
+library(dplyr)
+
+```
+
+```{r}
+population_2020 <- CSV1 %>% dplyr::filter(year == 2020)
+```
+
+```{r}
+world_map_data <- map_data("world")
+```
+
+
+```{r}
+population_map_data <- inner_join(world_map_data, population_2020, by = c("region" = "country"), relationship = "many-to-many")
+```
+
+
+```{r}
+world_map <- ggplot(data = population_map_data, aes(x = long, y = lat, group = group, fill = Population)) +
+  geom_polygon(color = "black", size = 0.1) +
+  scale_fill_gradient(low = "grey", high = "yellow", name = "Population", guide = guide_colorbar(title.position = "top", title.hjust = 0.5)) +
+  labs(title = "World Population in 2020") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.4, size = 16, face = "bold"))
+```
+
+
+```{r}
+world_map
+```
+
+## **Results**: According to the World map representing the Population of the world in the year 2020, it can be observed that India has the largest population among all the countries.
+
+
+# 2.  **VISUALIZATION 2**: ***Bar Chart of Top 20 Countries with the Highest GDP in the Year 2020*** 
+## A bar chart is utilized to represent UNICEF data, highlighting the 20 countries with the highest GDP for the year 2020.
+### *Bar Chart*:  is a graphical representation of data in which rectangular bars are used to display the values of the variables. The height or length of each bar represents the value of the variable being displayed.
+### The GDP of a country is an essential indicator of the economic well-being of its citizens. A high GDP indicates that a country is producing more goods and services, which can contribute to a better standard of living for its population.
+
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(forcats)
+library(RColorBrewer)
+library(ggrepel)
+library(scales)
+library(viridisLite)
+library(plotly)
+library(dplyr)
+library(conflicted)
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+top_20 <- CSV1 %>% 
+  group_by(country) %>%
+  summarize(GDP = max(GDP, na.rm = TRUE)) %>%
+  arrange(desc(GDP)) %>%
+  top_n(20, wt = GDP)
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+colors <- c("#FF5733", "#C70039", "#900C3F", "#FFB6C1", "#355C7D", "#2471A3", "#2E86C1", "#5DADE2", "#A9DFBF", "#48C9B0", "#16A085", "#F1C40F", "#F7DC6F", "#FFA07A", "#E74C3C", "#8E44AD", "#F39C12", "#E67E22", "#D35400", "#BDC3C7")
+```
+
+```{r, message=FALSE, warning=FALSE}
+p <- ggplot(top_20, aes(x = reorder(country, GDP), y = GDP, fill = country)) +
+  geom_col() +
+  scale_fill_manual(values = colors) +
+  labs(title = "Top 20 Countries by GDP",
+       x = "Country",
+       y = "GDP (constant 2020)") +
+  theme(plot.title = element_text(size = 14, hjust = 0.5, face = "bold"),
+        axis.text.x = element_text(angle = 90, vjust = 0.1, hjust = 1, ),
+        panel.grid.major.y = element_line(color = "gray90", linewidth = 0.5),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "none",
+        plot.margin = unit(c(0, 0, 0, 0), "lines")) +
+  geom_text_repel(aes(label = comma(GDP)), size = 3, force = 8, min.segment.length = 0.5, hjust = 0.5) +
+  theme(legend.direction = "horizontal",
+        legend.position = "bottom",
+        legend.text = element_text(size = 8),
+        legend.key.size = unit(0.25, "lines"),
+        legend.key.width = unit(0.2,"lines"),
+        legend.key.height = unit(0.2, "lines"),
+        legend.box = "none")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+ggplotly(p + theme(legend.position = "bottom"))
+```
+## **Results**: The above bar chart is an interactive visualization that shows the GDP of various countries using rectangular bars. By hovering over a specific country's bar, users can view the exact GDP value through tooltips. Based on this bar plot, it appears that the **Netherlands has the highest GDP** among all the countries for the year 2020. A strong economy can contribute to an improved standard of living for the country's citizens.
+
+
+# 3. **VISUALIZATION 3** - ***Time series Chart of Inflation Trends in Top GDP Performing Countries of 2020*** .
+## Inflation trend top gdp performing countries for  over the year 2020 is plotted using a time series chart.
+### *Time series chart* is a graphical representation of data points or observations plotted against time, with each point on the chart corresponding to a specific time period. These charts can help identify trends, patterns, and anomalies in the data that may be useful for forecasting or decision-making.
+### Analyzing the inflation trend with respect to years for the top GDP countries is important for understanding their economic health and for predicting future economic outcomes. Inflation is the rate at which the general level of prices for goods and services is rising, and it is typically measured as the percentage change in the Consumer Price Index (CPI) over time. If the inflation rate is high and continuously increasing, it could indicate a decrease in the purchasing power of consumers and an overall decline in the economy. On the other hand, if the inflation rate is low and stable, it could indicate a healthy and stable economy.
+
+```{r, message=FALSE, warning=FALSE}
+top_20 <- CSV1 %>% 
+  group_by(country) %>%
+  summarize(GDP = max(GDP, na.rm = TRUE)) %>%
+  arrange(desc(GDP)) %>%
+  top_n(20, wt = GDP)
+```
+
+```{r, message=FALSE, warning=FALSE}
+CSV1_top_20 <- CSV1 %>% 
+  dplyr::filter(country %in% top_20$country)
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+colors <- c("#FF5733", "#C70039", "#900C3F", "#FFB6C1", "#355C7D", "#2471A3", "#2E86C1", "#5DADE2", "#A9DFBF", "#48C9B0", "#16A085", "#F1C40F", "#F7DC6F", "#FFA07A", "#E74C3C", "#8E44AD", "#F39C12", "#E67E22", "#D35400", "#BDC3C7")
+```
+
+```{r, message=FALSE, warning=FALSE}
+p <- CSV1_top_20 %>%
+  ggplot(aes(x = year, y = Inflation, color = country)) +
+  geom_line() +
+  scale_color_manual(values = colors) +
+  labs(title = "Inflation trend for Top 20 Countries by GDP",
+       x = "Year",
+       y = "Inflation") +
+  theme(plot.title = element_text(size = 16, hjust = 0.5, face = "bold"),
+        axis.text.x = element_text(angle = 90, vjust = 0.1, hjust = 1, size = 12),
+        axis.text.y = element_text(size = 12),
+        panel.grid.major.y = element_line(color = "gray90", linewidth = 0.5),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "bottom",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        legend.key.size = unit(0.25, "lines"),
+        legend.key.width = unit(0.2, "lines"),
+        legend.key.height = unit(0.2, "lines"),
+        legend.box = "horizontal",
+        plot.background = element_rect(fill = "gray95"),
+        panel.background = element_rect(fill = "gray95"),
+        plot.margin = unit(c(1, 1, 0.5, 0.5), "cm"))
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+p <- ggplotly(p, tooltip = "text") %>%
+  plotly::layout(hoverlabel = list(bgcolor = "white", font = list(size = 14)),
+                 xaxis = list(title = "Year", tickangle = 90),        
+                 yaxis = list(title = "Inflation (%)", tickfont = list(size = 12)),
+                 dragmode = "zoom",
+                 margin = list(l = 50, r = 50, b = 50, t = 50, pad = 4))
+
+
+```
+
+
+
+```{r, message=FALSE, warning=FALSE}
+ggplotly(p)
+```
+## **Results**:Based on the above time series plot, it appears that the **Poland** has the highest inflation rate in the year 1970 among all the countries. This indicates that in the year 1970, the rate of increase in prices of goods and services in Poland was higher compared to other countries in the dataset. This could be due to various factors such as an increase in the money supply, higher demand for goods and services, a decrease in supply, or an increase in production costs. High inflation rates can have a negative impact on the economy, such as reducing purchasing power, causing uncertainty, and affecting the balance of trade.
+
+
+
+# 4. **VISUALIZATION 4** - ***Scatter plot-Relationship between Population and Life Expectancy in the Netherlands***
+## This analysis aims to explore the relationship between **life expectancy and population in Netherlands** using an *interactive scatter plot with a regression line*
+### *Scatter Plot*: It lies in its ability to help us understand and visualize the relationship between two variables. By plotting the data points on a graph and adding a line of best fit, we can quickly see if there is a relationship between the two variables, and if so, the nature and strength of the relationship. 
+### The relationship between Population and Life expetancy is important because it can provide insights into the quality of life and overall health of a population. Higher life expectancies may indicate better access to healthcare, better living conditions, and a higher quality of life in general.
+
+```{r}
+netherlands_data <- subset(CSV1, country == "Netherlands")
+x <- netherlands_data$Life.expectancy
+y <- netherlands_data$Population
+```
+
+
+```{r}
+netherlands_plot <- ggplot(netherlands_data, aes(x = Life.expectancy, y = Population)) +
+  geom_point(color = "lightgreen", size = 4) +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Relationship between Life Expectancy and Population in Netherlands",
+       x = "Life Expectancy", y = "Population") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, face = "bold", hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        plot.margin = margin(8, 0, 0, 0, "pt"))
+
+netherlands_plotly <- ggplotly(netherlands_plot, width = 800, height = 600)
+netherlands_plotly %>%
+  plotly::layout(title = "Relationship between Life Expectancy and Population in Netherlands",
+                 xaxis = list(title = "Life Expectancy"),
+                 yaxis = list(title = "Population"))
+
+```
+## **Results**: The above graph illustrates a significant positive correlation between the population and life expectancy in the Netherlands, which had the highest GDP among all countries in the year 2020. The plot highlights the relationship between the two variables, showing that higher life expectancy corresponds to higher population. The linear regression line on the graph indicates a moderately strong association between the two factors.
+
+
+# Summary: 
+## The analyzed visualizations showcase the relationship between different factors, including population and life expectancy, GDP, inflation rates, and BMI-for-age. The year 2020 saw India as having the highest population, and the world map displays the potential effect of population on BMI-for-age. The Netherlands had the highest GDP in 2020, while Poland recorded the highest inflation rate in 1970. Additionally, the scatter plot highlights a positive correlation between population and life expectancy in the Netherlands. These visualizations offer crucial insights into the connection between various factors and can aid in research and decision-making.
